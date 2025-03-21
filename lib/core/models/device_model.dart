@@ -1,4 +1,3 @@
-//{name: Impianto, id: 1560UMGGI9F3, description: ---, version: 25.2.5, hwType: GWC_V3, connectionStatus: 1, powerStatus: 1, ip: 10.9.0.37, port: 8001}
 
 class DeviceModel {
   final String name;

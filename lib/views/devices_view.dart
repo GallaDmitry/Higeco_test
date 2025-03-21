@@ -3,15 +3,15 @@ import 'package:go_router/go_router.dart';
 import 'package:higeco_test/core/models/device_model.dart';
 import 'package:higeco_test/core/repositories/device_repository.dart';
 
-class PlantView extends StatefulWidget {
+class DevicesView extends StatefulWidget {
   final int plantId;
-  const PlantView({super.key, required this.plantId});
+  const DevicesView({super.key, required this.plantId});
 
   @override
-  State<PlantView> createState() => _PlantViewState();
+  State<DevicesView> createState() => _DevicesViewState();
 }
 
-class _PlantViewState extends State<PlantView> {
+class _DevicesViewState extends State<DevicesView> {
   bool loading = false;
   List devices = [];
   @override
@@ -36,7 +36,7 @@ class _PlantViewState extends State<PlantView> {
         return Column(
           children: [
             ListTile(
-              onTap: ()=>context.go('/device/${device.id}'),
+              onTap: ()=>context.push('/device/${widget.plantId}/${device.id}'),
               contentPadding: EdgeInsets.zero,
               leading: Icon(Icons.devices),
               title: Text(device.name),
