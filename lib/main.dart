@@ -1,18 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:higeco_test/utils/shared_preferences.dart';
 import 'package:higeco_test/views/home_view.dart';
+import 'package:higeco_test/views/loading_view.dart';
 
-void main() {
+import 'core/bloc/auth/auth_bloc_cubit.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await HigecoSharedPreferences.init();
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Higeco Test',
-      home:  HomeView(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBlocCubit>(create: (context) => AuthBlocCubit()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Higeco Test',
+        home: BlocBuilder<AuthBlocCubit, AuthBlocState>(
+          builder: (context, state) {
+            return state.isAuth ? HomeView() : LoadingView();
+          },
+        ),
+      ),
     );
   }
 }
