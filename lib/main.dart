@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:higeco_test/utils/router.dart';
 import 'package:higeco_test/utils/shared_preferences.dart';
 import 'package:higeco_test/views/home_view.dart';
 import 'package:higeco_test/views/loading_view.dart';
@@ -26,14 +27,15 @@ class _MyAppState extends State<MyApp> {
       providers: [
         BlocProvider<AuthBlocCubit>(create: (context) => AuthBlocCubit()),
       ],
-      child: MaterialApp(
+      child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: 'Higeco Test',
-        home: BlocBuilder<AuthBlocCubit, AuthBlocState>(
+        routerConfig: router,
+        /*home: BlocBuilder<AuthBlocCubit, AuthBlocState>(
           builder: (context, state) {
             return state.isAuth ? HomeView() : LoadingView();
           },
-        ),
+        ),*/
       ),
     );
   }

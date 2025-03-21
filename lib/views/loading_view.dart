@@ -22,8 +22,15 @@ class _LoadingViewState extends State<LoadingView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: CupertinoActivityIndicator(),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: double.infinity,
+            margin: EdgeInsets.only(bottom: 20),
+              child: Text('Authenticating...', textAlign: TextAlign.center,)),
+          CupertinoActivityIndicator()],
       ),
     );
   }
