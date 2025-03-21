@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:higeco_test/core/models/plant_model.dart';
@@ -31,7 +32,9 @@ class _HomeViewState extends State<HomeView> {
           getPlants();
           return Future.value(true);
         },
-        child: ListView.builder(
+        child: loading ?
+        Center(child:   CupertinoActivityIndicator())
+            : ListView.builder(
           padding: EdgeInsets.symmetric(horizontal: 10),
             itemCount: plants.length,
             itemBuilder: (_, i) {

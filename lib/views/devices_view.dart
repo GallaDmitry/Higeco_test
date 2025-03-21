@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:higeco_test/core/models/device_model.dart';
@@ -28,7 +29,8 @@ class _DevicesViewState extends State<DevicesView> {
             child: Icon(Icons.chevron_left)),
         title: Text('Devices of plant #${widget.plantId}'),
       ),
-      body: ListView.builder(
+      body: loading ?
+      Center(child:   CupertinoActivityIndicator()) : ListView.builder(
           padding: EdgeInsets.symmetric(horizontal: 10),
         itemCount: devices.length,
           itemBuilder: (_, i) {
