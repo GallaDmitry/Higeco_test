@@ -41,6 +41,7 @@ class _LogsViewState extends State<LogsView> {
           return Column(
             children: [
               ListTile(
+                onTap: () => context.push('/log/${widget.plantId}/${widget.deviceId}/${log.id}'),
                 contentPadding: EdgeInsets.zero,
                 leading: Icon(Icons.list),
                 title: Text(log.name),
