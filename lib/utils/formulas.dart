@@ -1,7 +1,7 @@
 import 'package:higeco_test/core/models/log_data_model.dart';
 
 class Formulas {
-  static const double nominalPower_kW = 3;
+  static const double nominalPower_kW = 4;
   static const double standartIrradiation_W_m2 = 1000;
 
   static String calculatePR(LogDataModel logsData, int? samplingTime) {

@@ -106,7 +106,7 @@ class _StatisticsViewState extends State<StatisticsView> {
         .copyWith(day: 1, hour: 0, minute: 0, second: 0, millisecond: 0)
         .millisecondsSinceEpoch;
     to = DateTime.now()
-        .copyWith(day: 2, hour: 0, minute: 0, second: 0, millisecond: 0).subtract(Duration(hours: 1)).millisecondsSinceEpoch;
+        .copyWith(day: 8, hour: 0, minute: 0, second: 0, millisecond: 0).subtract(Duration(hours: 1)).millisecondsSinceEpoch;
   }
 
   void getLog() async {
