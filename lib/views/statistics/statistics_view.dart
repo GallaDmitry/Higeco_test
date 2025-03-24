@@ -1,9 +1,17 @@
+import 'dart:io';
+
+import 'package:csv/csv.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:higeco_test/core/models/log_data_model.dart';
+import 'package:higeco_test/core/models/log_model.dart';
 import 'package:higeco_test/core/repositories/data_request_repository.dart';
+import 'package:higeco_test/core/repositories/log_repository.dart';
 import 'package:higeco_test/utils/formulas.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 
 class StatisticsView extends StatefulWidget {
   final int plantId;
@@ -19,6 +27,7 @@ class StatisticsView extends StatefulWidget {
 
 class _StatisticsViewState extends State<StatisticsView> {
   late LogDataModel logsData;
+  late LogModel log;
   bool loading = false;
   late int from, to;
 
@@ -26,6 +35,7 @@ class _StatisticsViewState extends State<StatisticsView> {
   void initState() {
     super.initState();
     initPeriod();
+    getLog();
     getLogsData();
   }
 
@@ -71,7 +81,7 @@ class _StatisticsViewState extends State<StatisticsView> {
                   ),
                   Text('PR:'),
                   Text(
-                    Formulas.calculatePR(logsData).toString(),
+                    Formulas.calculatePR(logsData, log.samplingTime).toString(),
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Container(
@@ -84,7 +94,7 @@ class _StatisticsViewState extends State<StatisticsView> {
                       child: ElevatedButton(onPressed: ()=>goToChart('Irraggiamento'), child: Text('Show Irraggiamento Chart'))),
                   Container(
                       width: double.infinity,
-                      child: ElevatedButton(onPressed: () {}, child: Text('Download CSV'))),
+                      child: ElevatedButton(onPressed: () => saveCSV(), child: Text('Save CSV'))),
                 ],
               ),
             ),
@@ -96,10 +106,17 @@ class _StatisticsViewState extends State<StatisticsView> {
         .copyWith(day: 1, hour: 0, minute: 0, second: 0, millisecond: 0)
         .millisecondsSinceEpoch;
     to = DateTime.now()
-        .toUtc()
-        .copyWith(day: 7, hour: 0, minute: 0, second: 0, millisecond: 0).subtract(Duration(hours: 1)).millisecondsSinceEpoch;
+        .copyWith(day: 2, hour: 0, minute: 0, second: 0, millisecond: 0).subtract(Duration(hours: 1)).millisecondsSinceEpoch;
   }
 
+  void getLog() async {
+    try {
+      var body = await LogRepository().getLog(widget.plantId, widget.deviceId, widget.logId);
+      log = LogModel.fromJson(body);
+    } catch (e) {
+
+    }
+  }
   void getLogsData() async {
     setState(() {
       loading = true;
@@ -107,7 +124,7 @@ class _StatisticsViewState extends State<StatisticsView> {
     try {
       var body = await DataRequestRepository().getLogData(
           widget.plantId, widget.deviceId, widget.logId,
-          from: (from / 1000).toString(), to: (to / 1000).toString());
+          from: (from / 1000).toString(), to: (to / 1000).toString(), samplingTime: '3600');
       setState(() {
         loading = false;
         logsData = LogDataModel.fromJson(body);
@@ -120,5 +137,32 @@ class _StatisticsViewState extends State<StatisticsView> {
   }
   void goToChart(String type) {
     context.push('/chart', extra: {'logData': logsData, 'type': type});
+  }
+  void saveCSV() async {
+    List<List<dynamic>> data = [
+      ['Time', 'Energia', 'Irraggiamento'],
+    ];
+    int energyIndex = logsData.items.firstWhere((item) => item['name'] == 'Energia', orElse: ()=>null)?['index'];
+    int irradiationIndex = logsData.items.firstWhere((item) => item['name'] == 'Irraggiamento', orElse: ()=>null)?['index'];
+    data.addAll(logsData.data.map((e) => [DateTime.fromMillisecondsSinceEpoch(e[0] * 1000).toString(), e[energyIndex], e[irradiationIndex]]).toList());
+    String csvData = const ListToCsvConverter().convert(data);
+    Directory? directory;
+
+    if (Platform.isAndroid) {
+      if (await Permission.storage.request().isGranted) {
+        directory = await getExternalStorageDirectory();
+      }
+    } else {
+      directory = await getApplicationDocumentsDirectory();
+    }
+
+    if (directory == null) {
+      return;
+    }
+
+    String filePath = "${directory.path}/data.csv";
+    File file = File(filePath);
+    await file.writeAsString(csvData);
+    Share.shareXFiles([XFile(filePath)]);
   }
 }
